@@ -76,7 +76,7 @@ def main():
                 # Generate new options file with retry limit of 5
 
                 new_options_file, reasoning, summary_of_changes = generate_option_file_with_llm(
-                    constants.CASE_NUMBER, options_files,
+                    options_files,
                     system_info(db_path, fio_result), temperature,
                     average_cpu_usage, average_memory_usage, 
                     constants.TEST_NAME, constants.VERSION)
