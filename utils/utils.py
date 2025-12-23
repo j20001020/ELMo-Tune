@@ -66,25 +66,6 @@ def store_best_option_file(options_files, output_folder_dir):
         for line in best_reasoning.splitlines():
             f.write("# " + line + "\n")
 
-def store_diff_options_list(options_list, output_folder_dir):
-    # Calculate differences between options_list
-    differences = calculate_differences(options_list)
-    changed_fields_frequency = defaultdict(lambda: 0)
-
-    with open(f"{output_folder_dir}/diffOptions.txt", 'w') as f:
-        for i, diff in enumerate(differences, start=1):
-            f.write(f"[MFN] Differences between iteration {i} and iteration {i + 1}: \n")
-            f.write(json.dumps(diff, indent=4))
-            f.write("\n")
-            f.write("=" * 50)
-            f.write("\n\n")
-
-            for key in diff["values_changed"]:
-                changed_fields_frequency[key] += 1
-
-        f.write("\n\n[MFN] Changed Fields Frequency:\n")
-        f.write(json.dumps(changed_fields_frequency, indent=4))
-
 # PATH UTILS
 def path_of_db():
     '''

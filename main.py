@@ -4,7 +4,7 @@ from utils.system_operations.fio_runner import get_fio_result
 from options_files.ops_options_file import parse_option_file_to_dict, get_initial_options_file
 
 import rocksdb.subprocess_manager as spm
-from utils.utils import log_update, store_best_option_file, path_of_db, store_diff_options_list
+from utils.utils import log_update, store_best_option_file, path_of_db
 from utils.system_operations.get_sys_info import system_info
 from llm.prompts_generator import generate_option_file_with_llm
 import os
@@ -116,7 +116,6 @@ def main():
         plot_multiple(options_files, "Ops Per Second",
                       f"{output_folder_dir}/opsM_per_sec.png")
         
-        # store_diff_options_list(options_list, output_folder_dir)
 
 
 
