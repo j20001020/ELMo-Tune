@@ -36,8 +36,8 @@ def main():
     db_path = path_of_db()
     fio_result = get_fio_result(constants.FIO_RESULT_PATH)
 
-    log_update(f"[MFN] Starting the program with the case number: {constants.CASE_NUMBER}")
-    print(f"[MFN] Starting the program with the case number: {constants.CASE_NUMBER}")
+    log_update(f"[MFN] Starting the program.")
+    print(f"[MFN] Starting the program.")
 
     # First run, Initial options file and see how the results are
     options, reasoning = get_initial_options_file()
