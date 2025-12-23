@@ -4,7 +4,7 @@ import getpass
 from datetime import datetime
 from collections import defaultdict
 from deepdiff import DeepDiff
-from utils.constants import OUTPUT_PATH, DEVICE, DB_PATH
+from utils.constants import OUTPUT_PATH, DB_PATH, TEST_NAME
 
 # LOG UTILS
 def log_update(update_string):
@@ -98,7 +98,7 @@ def path_of_output_folder():
     current_datetime = datetime.now()
     date_time_string = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
     if OUTPUT_PATH is None:
-        output_folder_dir = f"output/output_{DEVICE}/output_{date_time_string}"
+        output_folder_dir = f"output/output_{date_time_string}_{TEST_NAME}"
     else:
         output_folder_dir = OUTPUT_PATH
 

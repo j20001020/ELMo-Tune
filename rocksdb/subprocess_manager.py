@@ -1,8 +1,7 @@
 import subprocess
 import os
-import time 
-
-from cgroup_monitor import CGroupMonitor
+import time
+import psutil
 
 from utils.utils import log_update, path_of_db
 from utils.constants import TEST_NAME, DB_BENCH_PATH, OPTIONS_FILE_DIR, NUM_ENTRIES, SIDE_CHECKER, FIO_RESULT_PATH
@@ -12,7 +11,7 @@ from utils.graph import plot_2axis
 from llm.prompts_generator import midway_options_file_generation
 from utils.system_operations.fio_runner import get_fio_result
 from utils.system_operations.get_sys_info import system_info
-
+from utils.resoruce_monitor import ResourceMonitor
 
 def pre_tasks(database_path, run_count):
     '''
@@ -128,11 +127,13 @@ def db_bench(db_bench_path, database_path, options, run_count, test_name, previo
 
 
     if SIDE_CHECKER and previous_throughput != None:
-        # cgroup_monitor = CGroupMonitor()
-        # cgroup_monitor.start_monitor()
         start_time = time.time()
 
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True) as proc_out:
+            p = psutil.Process(proc_out.pid)
+            resource_monitor = ResourceMonitor(p)
+            resource_monitor.start_monitor()
+            
             output = ""
             check_interval = 30
             for line in proc_out.stdout:
@@ -147,8 +148,7 @@ def db_bench(db_bench_path, database_path, options, run_count, test_name, previo
                     if (current_avg_throughput < 0.9 * float(previous_throughput)) and (bm_iter < 3):
                         print("[SQU] Throughput decreased, resetting the benchmark")
                         log_update(f"[SQU] Throughput decreased {previous_throughput}->{current_avg_throughput}, resetting the benchmark")
-                        # avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
-                        avg_cpu_used, avg_mem_used = -1.0, -1.0
+                        avg_cpu_used, avg_mem_used = resource_monitor.stop_monitor()
                         proc_out.kill()
 
                         db_path = path_of_db()
@@ -175,21 +175,18 @@ def db_bench(db_bench_path, database_path, options, run_count, test_name, previo
         print("[SPM] Finished running db_bench")
         print("----------------------------------------------------------------------------")
         print("[SPM] Output: ", output)
-        # avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
-        avg_cpu_used, avg_mem_used = -1.0, -1.0
+        avg_cpu_used, avg_mem_used = resource_monitor.stop_monitor()
         return output, avg_cpu_used, avg_mem_used, options
     else:
-        # cgroup_monitor = CGroupMonitor()
-        # cgroup_monitor.start_monitor()
-        proc_out = subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            check=False
-        )
-        # avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
-        avg_cpu_used, avg_mem_used = -1.0, -1.0
-        return proc_out.stdout.decode(), avg_cpu_used, avg_mem_used, options
+        proc_out = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = psutil.Process(proc_out.pid)
+        resource_monitor = ResourceMonitor(p)
+        resource_monitor.start_monitor()
+        
+        stdout, _ = proc_out.communicate()
+        
+        avg_cpu_used, avg_mem_used = resource_monitor.stop_monitor()
+        return stdout.decode(), avg_cpu_used, avg_mem_used, options
 
 
 def benchmark(db_path, options, output_file_dir, reasoning, iteration_count, previous_results, options_files):
@@ -247,11 +244,11 @@ def benchmark(db_path, options, output_file_dir, reasoning, iteration_count, pre
                    f"{output_file_dir}/ops_per_sec_{ini_file_count}.png")
         log_update(f"[SPM] Latest result: {benchmark_results['data_speed']}"
                         f"{benchmark_results['data_speed_unit']} and {benchmark_results['ops_per_sec']} ops/sec.")
-        log_update(f"[SPM] Avg CPU and Memory usage: {average_cpu_usage}% and {average_memory_usage}%")
+        log_update(f"[SPM] Avg CPU and Memory usage: {average_cpu_usage:.2f}% and {average_memory_usage:.2f}MB")
         print(
             f"[SPM] Latest result: {benchmark_results['data_speed']}",
             f"{benchmark_results['data_speed_unit']} and {benchmark_results['ops_per_sec']} ops/sec.\n",
-            f"[SPM] Avg CPU and Memory usage: {average_cpu_usage}% and {average_memory_usage}%"
+            f"[SPM] Avg CPU and Memory usage: {average_cpu_usage:.2f}% and {average_memory_usage:.2f}MB"
         )
 
     return is_error, benchmark_results, average_cpu_usage, average_memory_usage, options

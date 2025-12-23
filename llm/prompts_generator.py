@@ -62,7 +62,7 @@ def generate_benchmark_info(test_name, benchmark_result, average_cpu_used, avera
                       f"{benchmark_result['data_speed_unit']}, Operations per second: {benchmark_result['ops_per_sec']}.")
     
     if average_cpu_used != -1 and average_mem_used != -1:
-        benchmark_line += f" CPU used: {average_cpu_used}%, Memory used: {average_mem_used}% during test."
+        benchmark_line += f" CPU used: {average_cpu_used:.2f}%, Memory used: {average_mem_used:.2f}% during test."
     
     return benchmark_line
 
