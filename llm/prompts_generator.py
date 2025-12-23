@@ -1,7 +1,7 @@
 import re
 from difflib import Differ
 from options_files.ops_options_file import cleanup_options_file
-from gpt.gpt_request import request_gpt
+from llm.llm_request import request_gpt
 from utils.utils import log_update
 from dotenv import load_dotenv
 import utils.constants as constants
@@ -184,7 +184,7 @@ def midway_options_file_generation(options, avg_cpu_used, avg_mem_used, last_thr
 
     return clean_options_file, reasoning, ""
 
-def generate_option_file_with_gpt(case, previous_option_files, device_information, temperature=0.4, average_cpu_used=-1.0, average_mem_used=-1.0, test_name="fillrandom", version="8.8.1"):
+def generate_option_file_with_llm(case, previous_option_files, device_information, temperature=0.4, average_cpu_used=-1.0, average_mem_used=-1.0, test_name="fillrandom", version="8.8.1"):
     """
     Function that generates an options file for RocksDB based on specified parameters and case scenarios.
     - This function selects one of three different approaches to generate a RocksDB configuration options file. 

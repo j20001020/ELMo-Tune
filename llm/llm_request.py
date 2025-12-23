@@ -3,11 +3,13 @@ import re
 from google import genai
 from google.genai import types
 
+GEMINI_MODEL = "gemini-2.5-flash"
+
 # Environment variables
 api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
-def request_gpt(system_content, user_contents, temperature):
+def request_llm(system_content, user_contents, temperature):
     '''
     Function to make an API call to GEMINI
 
@@ -30,7 +32,7 @@ def request_gpt(system_content, user_contents, temperature):
 
     # Assuming 'client' is already defined and authenticated for GEMINI API access
     completion = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=GEMINI_MODEL,
         config=types.GenerateContentConfig(
             system_instruction=system_content,
             temperature=temperature,

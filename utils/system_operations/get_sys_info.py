@@ -3,7 +3,7 @@ import psutil
 import subprocess
 import platform
 from cpuinfo import get_cpu_info
-from cgroup_monitor import CGroupMonitor
+# from cgroup_monitor import CGroupMonitor
 
 def get_system_data(db_path):
     '''
@@ -19,10 +19,12 @@ def get_system_data(db_path):
     - total_disk_size (int): The total disk size
     - device (str): The device name
     '''
-    cgroup_monitor = CGroupMonitor()
+    # cgroup_monitor = CGroupMonitor() # 容器環境適用
     try:
-        cpu_count = os.getenv("CPU_COUNT", str(cgroup_monitor.get_cpu_limit()))
-        mem_max = os.getenv("MEMORY_MAX", str(cgroup_monitor.get_memory_limit()))
+        # cpu_count = os.getenv("CPU_COUNT", str(cgroup_monitor.get_cpu_limit()))
+        # mem_max = os.getenv("MEMORY_MAX", str(cgroup_monitor.get_memory_limit()))
+        cpu_count = os.getenv("CPU_COUNT", str(os.cpu_count()))
+        mem_max = os.getenv("MEMORY_MAX", str(psutil.virtual_memory().total))
 
         # gets the CPU op-modes
         system_info = platform.uname()

@@ -9,7 +9,7 @@ from utils.constants import TEST_NAME, DB_BENCH_PATH, OPTIONS_FILE_DIR, NUM_ENTR
 from rocksdb.parse_db_bench_output import parse_db_bench_output
 from utils.utils import store_db_bench_output
 from utils.graph import plot_2axis
-from gpt.prompts_generator import midway_options_file_generation
+from llm.prompts_generator import midway_options_file_generation
 from utils.system_operations.fio_runner import get_fio_result
 from utils.system_operations.get_sys_info import system_info
 
@@ -128,8 +128,8 @@ def db_bench(db_bench_path, database_path, options, run_count, test_name, previo
 
 
     if SIDE_CHECKER and previous_throughput != None:
-        cgroup_monitor = CGroupMonitor()
-        cgroup_monitor.start_monitor()
+        # cgroup_monitor = CGroupMonitor()
+        # cgroup_monitor.start_monitor()
         start_time = time.time()
 
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True) as proc_out:
@@ -147,7 +147,8 @@ def db_bench(db_bench_path, database_path, options, run_count, test_name, previo
                     if (current_avg_throughput < 0.9 * float(previous_throughput)) and (bm_iter < 3):
                         print("[SQU] Throughput decreased, resetting the benchmark")
                         log_update(f"[SQU] Throughput decreased {previous_throughput}->{current_avg_throughput}, resetting the benchmark")
-                        avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
+                        # avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
+                        avg_cpu_used, avg_mem_used = -1.0, -1.0
                         proc_out.kill()
 
                         db_path = path_of_db()
@@ -167,18 +168,20 @@ def db_bench(db_bench_path, database_path, options, run_count, test_name, previo
         print("[SPM] Finished running db_bench")
         print("----------------------------------------------------------------------------")
         print("[SPM] Output: ", output)
-        avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
+        # avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
+        avg_cpu_used, avg_mem_used = -1.0, -1.0
         return output, avg_cpu_used, avg_mem_used, options
     else:
-        cgroup_monitor = CGroupMonitor()
-        cgroup_monitor.start_monitor()
+        # cgroup_monitor = CGroupMonitor()
+        # cgroup_monitor.start_monitor()
         proc_out = subprocess.run(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             check=False
         )
-        avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
+        # avg_cpu_used, avg_mem_used = cgroup_monitor.stop_monitor()
+        avg_cpu_used, avg_mem_used = -1.0, -1.0
         return proc_out.stdout.decode(), avg_cpu_used, avg_mem_used, options
 
 

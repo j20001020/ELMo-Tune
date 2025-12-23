@@ -17,7 +17,7 @@ def path_of_output_folder():
     '''
     current_datetime = datetime.now()
     date_time_string = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
-    output_folder_dir = f"output/output_{DEVICE}/output_{date_time_string}"
+    output_folder_dir = f"output/output_{date_time_string}"
 
     os.makedirs(output_folder_dir, exist_ok=True)
     print(f"[UTL] Using output folder: {output_folder_dir}")
@@ -30,7 +30,7 @@ env_TEST_NAME = os.getenv("TEST_NAME", None)
 env_CASE_NUMBER = os.getenv("CASE_NUMBER", 1)
 env_VERSION = os.getenv("VERSION", "8.8.1")
 env_OUTPUT_PATH = os.getenv("OUTPUT_PATH", None)
-env_NUM_ENTRIES = os.getenv("NUM_ENTRIES", 3000000000)
+env_NUM_ENTRIES = os.getenv("NUM_ENTRIES", 30000000)
 env_SIDE_CHECKER = os.getenv("SIDE_CHECKER", True)
 
 # Parse the arguments. They replace the environment variables if they are set
@@ -43,7 +43,7 @@ parser.add_argument('-o', '--output', type=str, default=env_OUTPUT_PATH, help='S
 parser.add_argument('-n', '--num_entries', type=int, default=env_NUM_ENTRIES, help='Specify the number of entries')
 parser.add_argument('-s', '--side_checker', type=bool, default=env_SIDE_CHECKER, help='Specify if side checker is enabled')
 
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 CASE_NUMBER = args.case
 DEVICE = args.device
 TEST_NAME = args.workload
@@ -54,9 +54,9 @@ SIDE_CHECKER = args.side_checker
 
 # Constants
 # DB_BENCH_PATH = f"/data/gpt_project/rocksdb-{VERSION}/db_bench"
-DB_BENCH_PATH = f"/rocksdb-{VERSION}/db_bench"
-DB_PATH = f"/{DEVICE}/gpt_project/db"
-FIO_RESULT_PATH = f"/data/gpt_project/gpt-assisted-rocksdb-config/data/fio/fio_output_{DEVICE}.txt"
+DB_BENCH_PATH = "/home/kai/RocksDB/rocksdb/db_bench"
+DB_PATH = "/mnt/rocksdb_data/bench_db" # 200VM的150GB disk 
+FIO_RESULT_PATH = f"/home/kai/RocksDB/rocksdb_tuning_experiment/fio/fio_output.txt"
 DEFAULT_OPTION_FILE_DIR = "options_files/default_options_files"
 INITIAL_OPTIONS_FILE_NAME = f"dbbench_default_options-{VERSION}.ini"
 OPTIONS_FILE_DIR = f"{OUTPUT_PATH}/options_file.ini"

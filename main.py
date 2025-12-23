@@ -6,7 +6,7 @@ from options_files.ops_options_file import parse_option_file_to_dict, get_initia
 import rocksdb.subprocess_manager as spm
 from utils.utils import log_update, store_best_option_file, path_of_db, store_diff_options_list
 from utils.system_operations.get_sys_info import system_info
-from gpt.prompts_generator import generate_option_file_with_gpt
+from llm.prompts_generator import generate_option_file_with_llm
 import os
 
 def main():
@@ -74,7 +74,7 @@ def main():
             for gpt_query_count in range(retry_counter, 0, -1):
                 # Generate new options file with retry limit of 5
 
-                new_options_file, reasoning, summary_of_changes = generate_option_file_with_gpt(
+                new_options_file, reasoning, summary_of_changes = generate_option_file_with_llm(
                     constants.CASE_NUMBER, options_files,
                     system_info(db_path, fio_result), temperature,
                     average_cpu_usage, average_memory_usage, 
@@ -115,7 +115,7 @@ def main():
         plot_multiple(options_files, "Ops Per Second",
                       f"{output_folder_dir}/opsM_per_sec.png")
         
-        store_diff_options_list(options_list, output_folder_dir)
+        # store_diff_options_list(options_list, output_folder_dir)
 
 
 
