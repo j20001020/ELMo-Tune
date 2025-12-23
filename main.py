@@ -72,25 +72,25 @@ def main():
             retry_counter = 5
             generated = False
 
-            for Gemini_query_count in range(retry_counter, 0, -1):
+            for llm_query_count in range(retry_counter, 0, -1):
                 # Generate new options file with retry limit of 5
 
-                new_options_file, reasoning, summary_of_changes = generate_option_file_with_llm(
+                new_options_file, reasoning = generate_option_file_with_llm(
                     options_files,
                     system_info(db_path, fio_result), temperature,
                     average_cpu_usage, average_memory_usage, 
                     constants.TEST_NAME, constants.VERSION)
                 if new_options_file is None:
-                    log_update(f"[MFN] Failed to generate options file. Retrying. Retries left: {Gemini_query_count - 1}")
-                    print("[MFN] Failed to generate options file. Retrying. Retries left: ", Gemini_query_count - 1)
+                    log_update(f"[MFN] Failed to generate options file. Retrying. Retries left: {llm_query_count - 1}")
+                    print("[MFN] Failed to generate options file. Retrying. Retries left: ", llm_query_count - 1)
                     continue
 
                 # Parse output
                 is_error, benchmark_results, average_cpu_usage, average_memory_usage, new_options_file = spm.benchmark(
                     db_path, new_options_file, output_folder_dir, reasoning, ITERATIONS, benchmark_results, options_files)
                 if is_error:
-                    log_update(f"[MFN] Benchmark failed. Retrying with new options file. Retries left: {Gemini_query_count - 1}")
-                    print("[MFN] Benchmark failed. Retrying with new options file. Retries left: ", Gemini_query_count - 1)
+                    log_update(f"[MFN] Benchmark failed. Retrying with new options file. Retries left: {llm_query_count - 1}")
+                    print("[MFN] Benchmark failed. Retrying with new options file. Retries left: ", llm_query_count - 1)
                     temperature += 0.1
                     continue
                 else:
@@ -99,8 +99,7 @@ def main():
 
             if generated:
                 options = new_options_file
-                options_files.append((options, benchmark_results, reasoning,
-                                      summary_of_changes))
+                options_files.append((options, benchmark_results, reasoning))
                 parsed_options = parse_option_file_to_dict(options)
                 options_list.append(parsed_options)
             else:

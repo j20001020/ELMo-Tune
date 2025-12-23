@@ -135,12 +135,9 @@ def midway_options_file_generation(options, avg_cpu_used, avg_mem_used, last_thr
         clean_options_file = cleanup_options_file(matches[1])
         reasoning = matches[0] + matches[2]
     else:
-        log_update("[LLM] Invalid response from LLM.")
-        print("[LLM] Invalid response from LLM.")
-        clean_options_file = None
-        reasoning = None
+        raise ValueError("Failed to get a valid response from LLM for midway options generation.")
 
-    return clean_options_file, reasoning, ""
+    return clean_options_file, reasoning
 
 def generate_option_file_with_llm(previous_option_files, device_information, temperature=0.4, average_cpu_used=-1.0, average_mem_used=-1.0, test_name="fillrandom", version="8.8.1"):
     """
@@ -172,7 +169,7 @@ def generate_option_file_with_llm(previous_option_files, device_information, tem
         clean_options_file = cleanup_options_file(matches[1])
         reasoning = matches[0] + matches[2]
     else:
-        log_update("[LLM] Invalid response from LLM.")
-        print("[LLM] Invalid response from LLM.")   
+        clean_options_file = None
+        reasoning = None
 
-    return clean_options_file, reasoning, ""
+    return clean_options_file, reasoning
