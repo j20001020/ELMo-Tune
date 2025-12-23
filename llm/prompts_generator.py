@@ -1,7 +1,7 @@
 import re
 from difflib import Differ
 from options_files.ops_options_file import cleanup_options_file
-from llm.llm_request import request_gpt
+from llm.llm_request import request_llm
 from utils.utils import log_update
 from dotenv import load_dotenv
 import utils.constants as constants
@@ -176,11 +176,14 @@ def midway_options_file_generation(options, avg_cpu_used, avg_mem_used, last_thr
     log_update("[OG] Prompt for midway options file generation")
     log_update(content)
 
-    matches = request_gpt(sys_content, user_content, 0.4)
+    matches = request_llm(sys_content, user_content, 0.4)
 
     if matches is not None:
         clean_options_file = cleanup_options_file(matches[1])
         reasoning = matches[0] + matches[2]
+    else:
+        log_update("[LLM] Invalid response from LLM.")
+        print("[LLM] Invalid response from LLM.")
 
     return clean_options_file, reasoning, ""
 
@@ -210,11 +213,14 @@ def generate_option_file_with_llm(case, previous_option_files, device_informatio
         system_content = generate_system_content(device_information, version)
         previous_option_file, _, _, _ = previous_option_files[-1]
         user_contents = generate_default_user_content(previous_option_file, previous_option_files, average_cpu_used, average_mem_used, test_name)
-        matches = request_gpt(system_content, user_contents, temperature)
-        # Process the GPT-generated response 
+        matches = request_llm(system_content, user_contents, temperature)
+        # Process the Gemini-generated response 
         if matches is not None:
             clean_options_file = cleanup_options_file(matches[1])
             reasoning = matches[0] + matches[2]
+        else:
+            log_update("[LLM] Invalid response from LLM.")
+            print("[LLM] Invalid response from LLM.")   
 
         return clean_options_file, reasoning, ""
 
@@ -257,7 +263,7 @@ def generate_option_file_with_llm(case, previous_option_files, device_informatio
         # Loop through each part and make API calls
         for chunk_string in chunk_strings:
             user_contents = generate_default_user_content(chunk_string, previous_option_files, average_cpu_used, average_mem_used, test_name)
-            matches = request_gpt(system_content, user_contents, temperature)
+            matches = request_llm(system_content, user_contents, temperature)
             if matches is not None:
                 clean_options_file = cleanup_options_file(matches[1])
                 reasoning += matches[0] + matches[2]
@@ -270,10 +276,10 @@ def generate_option_file_with_llm(case, previous_option_files, device_informatio
         log_update("[OG] Generating options file with differences")
         print("[OG] Generating options file with differences")
         system_content = generate_system_content(device_information, version)
-        # Request GPT to generate new option
+        # Request Gemini to generate new option
         user_contents = generate_user_content_with_difference(previous_option_files, average_cpu_used, average_mem_used, test_name)
-        matches = request_gpt(system_content, user_contents, temperature)
-        # Process the GPT response
+        matches = request_llm(system_content, user_contents, temperature)
+        # Process the Gemini response
         if matches is not None:
             clean_options_file = cleanup_options_file(matches[1])
             reasoning = matches[0] + matches[2]

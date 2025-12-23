@@ -154,7 +154,7 @@ def db_bench(db_bench_path, database_path, options, run_count, test_name, previo
                         db_path = path_of_db()
                         fio_result = get_fio_result(FIO_RESULT_PATH)
                         device_info = system_info(db_path, fio_result)
-
+                        
                         new_options, _, _ = midway_options_file_generation(options, avg_cpu_used, avg_mem_used, current_avg_throughput, device_info, options_files)
                         output, avg_cpu_used, avg_mem_used, options = db_bench(db_bench_path, database_path, new_options, run_count, test_name, previous_throughput, options_files, bm_iter+1)
 
